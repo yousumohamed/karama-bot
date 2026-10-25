@@ -1,5 +1,4 @@
 import {
-  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   ChannelSelectMenuBuilder,
@@ -10,10 +9,10 @@ import {
   ModalBuilder,
   RoleSelectMenuBuilder,
   StringSelectMenuBuilder,
-  TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
 import { BRAND_COLOR, PREFIX } from '../config.js';
+import { row, textField } from '../ui.js';
 import { describeImage } from './images.js';
 import { PLACEHOLDER_HELP } from './message.js';
 import { LANGUAGES, MAX_BUTTONS } from './settings.js';
@@ -26,8 +25,6 @@ const button = (action, label, emoji, style = ButtonStyle.Secondary, panelId) =>
 
 const toggle = (action, label, emoji, on) =>
   button(action, `${label}: ${on ? 'On' : 'Off'}`, emoji, on ? ButtonStyle.Success : ButtonStyle.Secondary);
-
-const row = (...components) => new ActionRowBuilder().addComponents(components);
 
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
@@ -190,16 +187,6 @@ export function advancedView(settings) {
 }
 
 // ─── Modals ──────────────────────────────────────────────────────────────────
-
-function textField(customId, label, { style = TextInputStyle.Short, value, placeholder, required = false, max, description } = {}) {
-  const input = new TextInputBuilder().setCustomId(customId).setStyle(style).setRequired(required);
-  if (value) input.setValue(value);
-  if (placeholder) input.setPlaceholder(placeholder);
-  if (max) input.setMaxLength(max);
-  const field = new LabelBuilder().setLabel(label).setTextInputComponent(input);
-  if (description) field.setDescription(description);
-  return field;
-}
 
 export function messageModal(settings) {
   return new ModalBuilder()

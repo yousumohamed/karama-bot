@@ -1,4 +1,5 @@
 import { MessageFlags, PermissionFlagsBits } from 'discord.js';
+import { ephemeral } from '../ui.js';
 import { autoRoleProblem, channelWarning } from './checks.js';
 import { parseImageInput, removeGuildImage, saveGuildImage } from './images.js';
 import { buildWelcomeMessage, sendWelcome } from './message.js';
@@ -18,11 +19,6 @@ import {
   messageModal,
 } from './panel.js';
 import { getWelcome, LANGUAGES, MAX_BUTTONS, resetWelcome, updateWelcome } from './settings.js';
-
-const ephemeral = (payload) => ({
-  ...(typeof payload === 'string' ? { content: payload } : payload),
-  flags: MessageFlags.Ephemeral,
-});
 
 const EMOJI_PATTERN =
   /^(?:<a?:\w{2,32}:\d{17,20}>|\p{Regional_Indicator}{2}|[#*0-9]️?⃣|\p{Extended_Pictographic}(?:️|[\u{1F3FB}-\u{1F3FF}]|‍\p{Extended_Pictographic})*)$/u;

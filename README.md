@@ -12,7 +12,8 @@ Discord bot for server essentials. Prefix: `?`
 4. Copy `.env.example` to `.env` and paste the token after `DISCORD_TOKEN=`.
 5. Set up the free MongoDB database (below) and paste its connection string after `MONGODB_URI=`.
 6. Invite the bot: **OAuth2 → URL Generator** → scope `bot` → permissions
-   `View Channels`, `Send Messages`, `Embed Links`, `Attach Files`, `Read Message History`, `Manage Roles`.
+   `View Channels`, `Send Messages`, `Embed Links`, `Attach Files`, `Read Message History`, `Manage Roles`,
+   `Manage Channels`, `Manage Messages`, `Manage Server` (needed to see which invite a member used).
 7. Install and run:
 
 ```bash
@@ -77,4 +78,57 @@ Placeholders in the title, message and footer: `{user}` `{username}` `{displayna
 
 Shortcut commands: `?welcome channel #channel`, `?welcome enable`, `?welcome disable`, `?welcome test`,
 `?welcome image` / `?welcome background` (attach an image), `?welcome reset`. See `?help`.
+
+## Ticket system
+
+Type `?ticket` (needs **Manage Server**) to open the setup panel:
+
+| Button | What it does |
+| --- | --- |
+| 📝 Panel Message | Title, text and button label of the public "Create Ticket" panel |
+| 💬 Ticket Message | Message shown inside every new ticket (`{user}` `{server}`) |
+| 🎨 Embed Color | Color of the ticket embeds |
+| 📂 Category | Category new ticket channels go in |
+| 📜 Log Channel | Where open/close/delete logs and transcripts are posted |
+| 👮 Support Roles | Roles that can see and manage every ticket |
+| ⚙️ Settings | Ask reason, ping support, DM transcript, max tickets per member |
+| 👀 Preview / 📤 Send Panel | See the public panel / post it in a channel |
+| 🔄 Reset / ✅ Enable / ❌ Disable | Reset settings, turn tickets on/off |
+
+How a ticket works:
+
+1. A member clicks **🎫 Create Ticket**, types a reason, and gets a private `ticket-0001` channel
+   that only they, the support roles and the bot can see.
+2. Staff click **🙋 Claim** to take it. Anyone in the ticket can click **🔒 Close**.
+3. Once closed, the member can't see it anymore and staff get **📑 Transcript**, **🔓 Reopen** and **⛔ Delete**.
+4. Deleting saves an HTML transcript to the log channel and DMs it to the member.
+
+Commands inside a ticket: `?ticket close`, `?ticket claim`, `?ticket add @member`, `?ticket remove @member`,
+`?ticket rename <name>`. Staff = support roles or anyone with **Manage Channels**.
+
+## Invite tracker
+
+| Command | What it does |
+| --- | --- |
+| `?invite #channel` | Post who invited each new member in that channel (a plain name like `?invite welcome` works too) |
+| `?invite summary` | Top 10 inviters and the 5 lowest |
+| `?invite @member` | A member's invites (your own if empty) |
+| `?invite off` / `?invite reset` | Stop join messages / reset all counts |
+
+Invites = people who joined with their link minus the ones who left. Counting starts once the bot is online
+with the **Manage Server** permission; earlier joins aren't known.
+
+## Bot status
+
+| Command | What it does |
+| --- | --- |
+| `?ping` | Show ping, uptime, servers, users, memory |
+| `?ping #channel` | Post a live status message there that updates every 10 minutes |
+| `?ping off` | Remove the live status |
+
+The coloured bar is the ping at each of the last 8 updates: 🟦 under 100 ms, 🟩 under 200, 🟨 under 400, 🟥 slower.
+
+## Help
+
+`?help` lists every command; `?help <command>` shows one (e.g. `?help ticket`).
 # karama-bot

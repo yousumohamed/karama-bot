@@ -1,8 +1,18 @@
-import { Client, Events, GatewayIntentBits, MessageFlags } from 'discord.js';
-import { commands } from './commands/index.js';
+import { Client, Events, GatewayIntentBits, MessageFlags, Partials } from 'discord.js';
+import { commandList, commands } from './commands/index.js';
 import { MONGODB_URI, PREFIX, TOKEN } from './config.js';
 import { startHealthServer } from './health.js';
+import {
+  cacheAllInvites,
+  cacheGuildInvites,
+  onInviteCreate,
+  onMemberJoinInvite,
+  onMemberLeaveInvite,
+} from './invites/tracker.js';
+import { startStatusUpdater } from './status/status.js';
 import { connectStorage } from './storage.js';
+import { handleTicketInteraction } from './tickets/interactions.js';
+import { removeTicket } from './tickets/settings.js';
 import { handleWelcomeInteraction } from './welcome/interactions.js';
 import { onMemberJoin } from './welcome/join.js';
 
@@ -18,6 +28,7 @@ if (!MONGODB_URI) {
 // Button/menu/modal custom IDs start with "<feature>:" and are routed here.
 const interactionHandlers = {
   welcome: handleWelcomeInteraction,
+  ticket: handleTicketInteraction,
 };
 
 const client = new Client({
@@ -26,13 +37,19 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildInvites,
   ],
+  // Lets "member left" fire for members who joined before the bot started.
+  partials: [Partials.GuildMember],
 });
 client.commands = commands;
+client.commandList = commandList;
 
-client.once(Events.ClientReady, (c) => {
+client.once(Events.ClientReady, async (c) => {
   console.log(`✅ Logged in as ${c.user.tag} — prefix "${PREFIX}" — ${c.guilds.cache.size} server(s)`);
   c.user.setActivity(`${PREFIX}help`);
+  await cacheAllInvites(c);
+  startStatusUpdater(c);
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -65,6 +82,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 client.on(Events.GuildMemberAdd, onMemberJoin);
+client.on(Events.GuildMemberAdd, onMemberJoinInvite);
+client.on(Events.GuildMemberRemove, onMemberLeaveInvite);
+client.on(Events.InviteCreate, onInviteCreate);
+client.on(Events.GuildCreate, cacheGuildInvites);
+// A ticket channel deleted by hand shouldn't count as an open ticket any more.
+client.on(Events.ChannelDelete, (channel) => channel.guild && removeTicket(channel.guild.id, channel.id));
 client.on(Events.Error, (err) => console.error('[client]', err));
 process.on('unhandledRejection', (err) => console.error('[unhandled]', err));
 

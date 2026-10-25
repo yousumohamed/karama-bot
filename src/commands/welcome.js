@@ -35,7 +35,7 @@ async function setImage(message, args, slot) {
 
 export default {
   name: 'welcome',
-  description: 'Open the welcome setup panel.',
+  title: '👋 Welcome',
   usage: [
     ['welcome', 'Open the welcome setup panel'],
     ['welcome channel #channel', 'Set the welcome channel'],
