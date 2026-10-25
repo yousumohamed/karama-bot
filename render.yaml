@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: karaama-bot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false # paste the token in the Render dashboard
+      - key: MONGODB_URI
+        sync: false # paste the Atlas connection string in the Render dashboard
+      - key: PREFIX
+        value: "?"
+      - key: NODE_VERSION
+        value: "22"
